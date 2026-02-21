@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book My Show Demo</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif;}
+    body { background:#f0f2f5; }
+    .container { width: 400px; margin:50px auto; background:#fff; padding:30px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+    h2 { text-align:center; margin-bottom:20px; color:#333; }
+    input, select { width:100%; padding:10px; margin:8px 0 15px 0; border:1px solid #ccc; border-radius:5px; }
+    button { width:100%; padding:12px; background:#ff4b2b; color:#fff; border:none; border-radius:5px; cursor:pointer; font-size:16px; }
+    button:hover { background:#ff416c; }
+    a { text-decoration:none; color:#ff4b2b; display:block; text-align:center; margin-top:10px;}
+    .hidden { display:none; }
+    .seat-container { display:grid; grid-template-columns: repeat(5, 40px); gap:10px; justify-content:center; margin-bottom:20px; }
+    .seat { width:40px; height:40px; background:#eee; cursor:pointer; border-radius:5px; display:flex; align-items:center; justify-content:center;}
+    .seat.selected { background:#ff4b2b; color:#fff; }
+    .seat.occupied { background:#444; cursor:not-allowed; color:#fff; }
+</style>
+</head>
+<body>
+
+<div class="container" id="login-section">
+    <h2>Login</h2>
+    <form id="login-form">
+        <input type="text" placeholder="Username" required id="username">
+        <input type="password" placeholder="Password" required id="password">
+        <button type="submit">Login</button>
+    </form>
+    <a href="#">Don't have an account? Sign Up</a>
+</div>
+
+<div class="container hidden" id="booking-section">
+    <h2>Book Your Movie Ticket</h2>
+    <form id="booking-form">
+        <label for="movie">Select Movie:</label>
+        <select id="movie" required>
+            <option value="">--Select--</option>
+            <option value="Avengers">Avengers: Endgame</option>
+            <option value="Inception">Inception</option>
+            <option value="Joker">Joker</option>
+        </select>
+        <label for="date">Date:</label>
+        <input type="text" id="date" placeholder="DD/MM/YYYY" required>
+
+        <label>Choose Seats:</label>
+        <div class="seat-container" id="seats">
+            <!-- Seats will be generated dynamically -->
+        </div>
+
+        <button type="submit">Proceed to Payment</button>
+    </form>
+</div>
+
+<div class="container hidden" id="payment-section">
+    <h2>Payment Details</h2>
+    <form id="payment-form">
+        <label for="cardname">Cardholder Name:</label>
+        <input type="text" id="cardname" placeholder="Your Name" required>
+
+        <label for="cardnumber">Card Number:</label>
+        <input type="text" id="cardnumber" placeholder="1234 5678 9012 3456" required>
+
+        <label for="expiry">Expiry Date:</label>
+        <input type="text" id="expiry" placeholder="MM/YY" required>
+
+        <label for="cvv">CVV:</label>
+        <input type="password" id="cvv" placeholder="123" required>
+
+        <button type="submit">Pay Now</button>
+    </form>
+</div>
+
+<div class="container hidden" id="confirmation-section">
+    <h2>Booking Confirmed!</h2>
+    <p id="confirm-text"></p>
+    <a href="#" id="restart">Book Another Ticket</a>
+</div>
+
+<script>
+    // LOGIN
+    const loginForm = document.getElementById('login-form');
+    const loginSection = document.getElementById('login-section');
+    const bookingSection = document.getElementById('booking-section');
+
+    loginForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        loginSection.classList.add('hidden');
+        bookingSection.classList.remove('hidden');
+    });
+
+    // SEAT GENERATION
+    const seatContainer = document.getElementById('seats');
+    const rows = 5;
+    const cols = 5;
+    const occupiedSeats = [2,7,12]; // example occupied seats
+    for(let i=0;i<rows*cols;i++){
+        const seat = document.createElement('div');
+        seat.classList.add('seat');
+        seat.innerText = i+1;
+        if(occupiedSeats.includes(i)){
+            seat.classList.add('occupied');
+        }
+        seat.addEventListener('click', function(){
+            if(!seat.classList.contains('occupied')){
+                seat.classList.toggle('selected');
+            }
+        });
+        seatContainer.appendChild(seat);
+    }
+
+    // BOOKING FORM
+    const bookingForm = document.getElementById('booking-form');
+    const paymentSection = document.getElementById('payment-section');
+    let selectedSeats = [];
+    let selectedMovie = '';
+    let selectedDate = '';
+
+    bookingForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        selectedSeats = Array.from(document.querySelectorAll('.seat.selected')).map(s=>s.innerText);
+        if(selectedSeats.length === 0){
+            alert('Please select at least one seat!');
+            return;
+        }
+        selectedMovie = document.getElementById('movie').value;
+        selectedDate = document.getElementById('date').value;
+
+        bookingSection.classList.add('hidden');
+        paymentSection.classList.remove('hidden');
+    });
+
+    // PAYMENT FORM
+    const paymentForm = document.getElementById('payment-form');
+    const confirmationSection = document.getElementById('confirmation-section');
+    const confirmText = document.getElementById('confirm-text');
+    const restartBtn = document.getElementById('restart');
+
+    paymentForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        // Simple success simulation
+        paymentSection.classList.add('hidden');
+        confirmText.innerText = `Movie: ${selectedMovie}\nDate: ${selectedDate}\nSeats: ${selectedSeats.join(', ')}\nPayment Successful!`;
+        confirmationSection.classList.remove('hidden');
+    });
+
+    restartBtn.addEventListener('click', function(){
+        confirmationSection.classList.add('hidden');
+        bookingSection.classList.remove('hidden');
+        // Reset selections
+        document.getElementById('movie').value = '';
+        document.getElementById('date').value = '';
+        document.querySelectorAll('.seat.selected').forEach(s=>s.classList.remove('selected'));
+    });
+</script>
+
+</body>
+</html>
