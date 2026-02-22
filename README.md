@@ -79,3 +79,5 @@ This project is intended as a front-end demo only.
 Seat selection and payment are simulated for learning purposes.
 
 Feel free to customize movies, seats, and styles to create your own ticket booking app.
+output:
+ https://aashikbasha07.github.io/project-7/
